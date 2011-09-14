@@ -21,8 +21,8 @@ class Shorty(irclib.SimpleIRCClient) :
 		chan = e.target()
 		txt = e.arguments()[0]
 		words = txt.split(' ')
-		if words[0] == '!med' :
-			search = words[1]
+		if words[0] == '!med' and len(words) > 1 :
+			search = '+'.join(words[1:])
 			try :
 				codes = json.loads(urllib2.urlopen("http://graphicsweb.wsj.com/documents/MEDICALCODES0911/data.php?sort=code&term=%s&dir=asc&startIndex=0&results=500" % search).read())["codes"]
 				if not codes :
@@ -31,7 +31,7 @@ class Shorty(irclib.SimpleIRCClient) :
 					random.shuffle(codes)
 					code = codes[0]
 					msg = ': '.join(code.values())
-			except RuntimeError :
+			except :
 				msg = "I died jim"
 
 			self.connection.privmsg(chan, msg)
