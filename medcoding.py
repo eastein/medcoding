@@ -6,6 +6,17 @@ import urllib2
 import random
 import json
 
+def search_icd(search) :
+	codes = json.loads(urllib2.urlopen("http://graphicsweb.wsj.com/documents/MEDICALCODES0911/data.php?sort=code&term=%s&dir=asc&startIndex=0&results=500" % search).read())["codes"]
+	if not codes :
+		msg = "He's dead jim"
+	else :
+		random.shuffle(codes)
+		code = codes[0]
+		msg = ': '.join(code.values())
+
+	return msg
+
 class Shorty(irclib.SimpleIRCClient) :
 	def __init__(self, server, nick, chan, len=40) :
 		self.len = len
@@ -24,13 +35,7 @@ class Shorty(irclib.SimpleIRCClient) :
 		if words[0] == '!med' and len(words) > 1 :
 			search = '+'.join(words[1:])
 			try :
-				codes = json.loads(urllib2.urlopen("http://graphicsweb.wsj.com/documents/MEDICALCODES0911/data.php?sort=code&term=%s&dir=asc&startIndex=0&results=500" % search).read())["codes"]
-				if not codes :
-					msg = "He's dead jim"
-				else :
-					random.shuffle(codes)
-					code = codes[0]
-					msg = ': '.join(code.values())
+				msg = search_icd(search)
 			except :
 				msg = "I died jim"
 
